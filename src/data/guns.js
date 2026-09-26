@@ -53,5 +53,21 @@ image: '/guns/shotgun.svg',
 description:
 'The other pump gun. Twin action bars, a simple safety on the tang, and a price that leaves money for ammunition.',
 },
+{
+name: 'Beretta 92FS',
+type: 'Pistol',
+caliber: '9mm',
+price: 679,
+image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Beretta_92_FS_p1030113.jpg/800px-Beretta_92_FS_p1030113.jpg',
+description: 'The iconic Italian sidearm. Double-action/single-action, open-slide design, and proven in military service worldwide.',
+},
+{
+name: 'Winchester 1894',
+type: 'Rifle',
+caliber: '.30-30 Win',
+price: 949,
+image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Winchester_Model_1894_-_30-30_WCF.jpg/800px-Winchester_Model_1894_-_30-30_WCF.jpg',
+description: 'The classic lever-action deer rifle. Light, fast-handling, and a piece of American history.',
+},
 ]
 export default GUNS
