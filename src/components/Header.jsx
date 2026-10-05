@@ -1,6 +1,6 @@
-const NAV = ['Catalog', 'About', 'Contact']
+const NAV = ['Catalog', 'About', 'Contact', 'Cart']
 
-function Header({ tab, onTab }) {
+function Header({ tab, onTab, cartCount }) {
   return (
     <header className="header">
       <span className="brand display">Bore &amp; Barrel</span>
@@ -12,7 +12,7 @@ function Header({ tab, onTab }) {
             className={tab === item ? 'nav-link active' : 'nav-link'}
             onClick={() => onTab(item)}
           >
-            {item}
+            {item === 'Cart' ? `Cart (${cartCount})` : item}
           </button>
         ))}
       </nav>

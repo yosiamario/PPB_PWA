@@ -1,39 +1,38 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import GUNS from '../data/guns.js'
 import GunCard from '../components/GunCard.jsx'
 
-function Catalog() {
-  const [search, setSearch] = useState('')
+function Catalog({ addToCart }) {
+  const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState('All')
-  const [sortBy, setSortBy] = useState('name') // 'name', 'price-asc', 'price-desc'
 
-  const filteredGuns = useMemo(() => {
-    let result = GUNS
+  let processedGuns = GUNS.filter((gun) => {
+    const matchesSearch = gun.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === 'All' || gun.type === filterType;
+    return matchesSearch && matchesType;
+  });
 
-    // 1. Search (Name filter)
-    if (search) {
-      result = result.filter(gun => gun.name.toLowerCase().includes(search.toLowerCase()))
+  const [sortBy, setSortBy] = useState('name')
+  const [sortOrder, setSortOrder] = useState('asc')
+
+  const toggleSort = (type) => {
+    if (sortBy === type) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(type)
+      setSortOrder('asc')
     }
+  }
 
-    // 2. Filter by type
-    if (filterType !== 'All') {
-      result = result.filter(gun => gun.type === filterType)
+  processedGuns.sort((a, b) => {
+    let result = 0
+    if (sortBy === 'name') {
+      result = a.name.localeCompare(b.name)
+    } else if (sortBy === 'price') {
+      result = a.price - b.price
     }
-
-    // 3. Sort
-    result = [...result].sort((a, b) => {
-      if (sortBy === 'name') {
-        return a.name.localeCompare(b.name)
-      } else if (sortBy === 'price-asc') {
-        return a.price - b.price
-      } else if (sortBy === 'price-desc') {
-        return b.price - a.price
-      }
-      return 0
-    })
-
-    return result
-  }, [search, filterType, sortBy])
+    return sortOrder === 'asc' ? result : -result
+  });
 
   return (
     <>
@@ -50,8 +49,8 @@ function Catalog() {
           <input 
             type="text" 
             placeholder="Search guns..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             style={{ padding: '8px', border: '1px solid var(--line)', flex: '1 1 200px' }}
           />
           <select 
@@ -63,26 +62,38 @@ function Catalog() {
             <option value="Pistol">Pistol</option>
             <option value="Rifle">Rifle</option>
             <option value="Shotgun">Shotgun</option>
+            <option value="Throwable">Throwable</option>
           </select>
-          <select 
-            value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value)}
-            style={{ padding: '8px', border: '1px solid var(--line)' }}
-          >
-            <option value="name">Sort by Name (A-Z)</option>
-            <option value="price-asc">Sort by Price (Low to High)</option>
-            <option value="price-desc">Sort by Price (High to Low)</option>
-          </select>
+          <button onClick={() => toggleSort('name')} style={{ 
+            padding: '8px 14px', 
+            border: sortBy === 'name' ? '2px solid var(--brass, #b8860b)' : '1px solid var(--line)', 
+            background: sortBy === 'name' ? 'var(--brass, #b8860b)' : '#fff', 
+            color: sortBy === 'name' ? '#fff' : 'inherit',
+            cursor: 'pointer',
+            fontWeight: sortBy === 'name' ? 'bold' : 'normal'
+          }}>
+            Sort by Name {sortBy === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+          </button>
+          <button onClick={() => toggleSort('price')} style={{ 
+            padding: '8px 14px', 
+            border: sortBy === 'price' ? '2px solid var(--brass, #b8860b)' : '1px solid var(--line)', 
+            background: sortBy === 'price' ? 'var(--brass, #b8860b)' : '#fff', 
+            color: sortBy === 'price' ? '#fff' : 'inherit',
+            cursor: 'pointer',
+            fontWeight: sortBy === 'price' ? 'bold' : 'normal'
+          }}>
+            Sort by Price {sortBy === 'price' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+          </button>
         </div>
 
         <div className="list-head">
           <h2>Current stock</h2>
-          <span className="count">{filteredGuns.length} pieces</span>
+          <span className="count">{processedGuns.length} pieces</span>
         </div>
         
-        {filteredGuns.length > 0 ? (
+        {processedGuns.length > 0 ? (
           <ul className="stock">
-            {filteredGuns.map((gun) => <GunCard key={gun.name} gun={gun} />)}
+            {processedGuns.map((gun) => <GunCard key={gun.name} gun={gun} addToCart={addToCart} />)}
           </ul>
         ) : (
           <p style={{ padding: '40px 0', textAlign: 'center', color: 'var(--steel)' }}>
